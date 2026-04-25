@@ -3,19 +3,19 @@ plugins {
 }
 
 android {
-    namespace = "com.dorameet.dora"
+    namespace = DoraShareVersion.NAME_SPACE
     compileSdk {
-        version = release(36) {
+        version = release(ModuleVersion.SDK_VERSION_COMPILE) {
             minorApiLevel = 1
         }
     }
 
     defaultConfig {
-        applicationId = "com.dorameet.dora"
-        minSdk = 31
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        applicationId = DoraShareVersion.APPLICATION_ID
+        minSdk = ModuleVersion.SDK_VERSION_MIN
+        targetSdk = ModuleVersion.SDK_VERSION_TARGET
+        versionCode = DoraShareVersion.VERSION_CODE
+        versionName = DoraShareVersion.VERSION_NAME
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
