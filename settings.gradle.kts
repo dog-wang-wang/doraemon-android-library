@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "dora"
 include(":app")
+include(":foundation")
