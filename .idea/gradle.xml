@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/foundation" />
+            <option value="$PROJECT_DIR$/log" />
           </set>
         </option>
       </GradleProjectSettings>
