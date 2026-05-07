@@ -1,11 +1,7 @@
 # 1. 仓库简介
-放一些平时使用的基础的 Android 基建类  
-命名参考我最喜欢的动漫
+放一些平时使用的基础的Android基建类
+命名参考我最喜欢的动漫![哆啦A梦](assets/img/readme_bg.webp "哆啦A梦")
 
-<p align="center">
-  <img src="assets/img/readme_bg.webp" alt="哆啦A梦" width="640" />
-</p>
----
 # 2. 分别介绍一下吧
 ## 2.1. app介绍
 app目录下是本项目的demoApp，目标是涵盖本项目的所有library的用法
