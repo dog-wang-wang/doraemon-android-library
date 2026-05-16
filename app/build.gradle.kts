@@ -20,6 +20,23 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    flavorDimensions += "channel"
+
+    productFlavors {
+        create(LibraryInfo.VARIANT_INNER) {
+            dimension = "channel"
+        }
+        create(LibraryInfo.VARIANT_VIVO) {
+            dimension = "channel"
+        }
+        create(LibraryInfo.VARIANT_OPPO) {
+            dimension = "channel"
+        }
+        create(LibraryInfo.VARIANT_XIAOMI) {
+            dimension = "channel"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
