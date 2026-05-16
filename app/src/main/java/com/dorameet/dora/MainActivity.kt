@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.dorameet.foundation.screen.activity.CheckTableComponentActivity
+import com.dorameet.log.debug
 
 class MainActivity : CheckTableComponentActivity() {
 
@@ -22,6 +23,7 @@ class MainActivity : CheckTableComponentActivity() {
     override fun onPhonePortrait() {
         super.onPhonePortrait()
         Toast.makeText(this, "竖屏", Toast.LENGTH_SHORT).show()
+        debug("OK")
     }
 
     override fun onPhoneLandScape() {
