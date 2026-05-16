@@ -24,5 +24,6 @@ android {
 }
 
 dependencies {
-    compileOnly(project(":foundation"))
+    implementation(libs.gson)
+    implementation(libs.kotlinx.coroutines.android)
 }
