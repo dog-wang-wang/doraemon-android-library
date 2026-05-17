@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.doraemon.foundation.screen.activity.CheckTableComponentActivity
+import com.doraemon.foundation.tips.toastShort
+import com.doraemon.foundation.utils.debugWithEvent
 import com.doraemon.log.debug
 
 class MainActivity : CheckTableComponentActivity() {
@@ -22,8 +24,9 @@ class MainActivity : CheckTableComponentActivity() {
 
     override fun onPhonePortrait() {
         super.onPhonePortrait()
-        Toast.makeText(this, "竖屏", Toast.LENGTH_SHORT).show()
-        debug("OK")
+        toastShort("竖屏")
+//        Toast.makeText(this, "竖屏", Toast.LENGTH_SHORT).show()
+        debugWithEvent("test事件","OK")
     }
 
     override fun onPhoneLandScape() {
