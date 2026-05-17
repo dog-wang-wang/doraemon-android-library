@@ -26,9 +26,6 @@ android {
 dependencies {
     compileOnly(libs.gson)
     compileOnly(project(":foundation"))
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.material)
     implementation(libs.bundles.retrofitBundle)
     implementation(libs.bundles.okhttpBundle)
     testImplementation(libs.junit)
