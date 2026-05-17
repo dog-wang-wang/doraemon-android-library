@@ -59,22 +59,14 @@ android {
 }
 
 dependencies {
+    // 引用本地模块
     implementation(project(":foundation"))
     implementation(project(":net"))
+    // compose的相关依赖
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.runtime)
-
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.activity.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.material)
+    implementation(libs.bundles.composeBundle)
+    // 测试依赖
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

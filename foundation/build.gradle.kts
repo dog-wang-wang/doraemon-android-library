@@ -23,14 +23,19 @@ android {
 }
 
 dependencies {
+    // log传递
     api(project(":log"))
+    // gson传递
     api(libs.gson)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.activity.ktx)
-    implementation(libs.material)
+    // androidx传递
+    api(libs.bundles.androidx)
+    // material传递
+    api(libs.material)
+    // lifecycle
     implementation(libs.bundles.lifecycle)
+    // MMKV不透传
     implementation(libs.mmkv)
+    // 测试依赖
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
