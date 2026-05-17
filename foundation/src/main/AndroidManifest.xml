@@ -3,11 +3,22 @@
     package="com.doraemon.foundation">
 
     <application>
+        <!--
+            ContextProvider 用于在应用启动时自动获取并初始化全局 Context。
+            通过 ContentProvider 的 onCreate 回调早于 Application.onCreate 的特性，实现库的无侵入式初始化。
+        -->
         <provider
             android:name=".ContextProvider"
             android:authorities="${applicationId}.com.doraemon.foundation.ContextProvider"
             android:exported="false"
             android:initOrder="100" />
+        <!--
+            参数说明：
+            android:name        - 指向具体的 ContentProvider 实现类。
+            android:authorities - 唯一标识，使用 ${applicationId} 前缀避免多个使用该库的 App 同时安装时产生冲突。
+            android:exported    - 设置为 false，确保该 Provider 仅限应用内部使用，不向外部暴露数据。
+            android:initOrder   - 控制初始化顺序，数值越大初始化越早，确保基础库优先完成 Context 获取。
+        -->
     </application>
 
 </manifest>
