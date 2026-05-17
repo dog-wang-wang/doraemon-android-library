@@ -26,3 +26,4 @@ rootProject.name = "dora"
 include(":app")
 include(":foundation")
 include(":log")
+include(":net")
