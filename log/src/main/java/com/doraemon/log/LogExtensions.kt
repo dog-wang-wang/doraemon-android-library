@@ -67,4 +67,4 @@ fun error(msg: String, tag: String? = null, throwable: Throwable? = null) = LogU
  * @param msg 日志内容。
  * @param tag 日志标签。
  */
-fun log(msg: String, tag: String) = msg.logD(tag)
+fun log(msg: String, tag: String?) = msg.logD(tag)
