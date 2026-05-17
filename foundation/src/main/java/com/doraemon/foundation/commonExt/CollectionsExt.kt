@@ -1,4 +1,4 @@
-package com.dora.common.commonExt
+package com.doraemon.foundation.commonExt
 
 /**
  * @author zhaojiahao
