@@ -1,13 +1,10 @@
 package com.doraemon.dora
 
 import com.doraemon.foundation.DoraBaseApplication
-import com.doraemon.log.LogUtils
+import com.doraemon.log.LogConfig
 
-open class Doraemon: DoraBaseApplication() {
-    override fun onCreate() {
-        super.onCreate()
-        LogUtils.init(isDebug()) {
-
-        }
-    }
+open class Doraemon() : DoraBaseApplication() {
+    override val isDebug = isDebug()
+    override val logConfiguration: LogConfig.Builder.() -> Unit
+        get() = super.logConfiguration
 }

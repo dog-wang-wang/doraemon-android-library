@@ -60,7 +60,6 @@ android {
 
 dependencies {
     implementation(project(":foundation"))
-    implementation(project(":log"))
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
