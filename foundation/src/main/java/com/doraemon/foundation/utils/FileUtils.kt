@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import com.doraemon.foundation.R
 import java.io.InputStream
 import java.io.OutputStream
@@ -94,13 +93,13 @@ private fun Context.saveToMediaStore(
         put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
     }
 
-    return tryCatching(onError = { Log.e("FileUtils", "文件保存失败: ${it.message}") }) {
+    return tryCatching(onError = { errorWithEvent(R.string.event_save_file, "文件保存失败: ${it.message}", throwable = it) }) {
         val uri = contentResolver.insert(collection, values) ?: return@tryCatching null
         contentResolver.openOutputStream(uri)?.use { 
             writeBlock(it)
             it.flush()
         }
-        Log.d("FileUtils", "文件保存成功: $uri")
+        debugWithEvent(R.string.event_save_file, "文件保存成功: $uri")
         uri
     }
 }
