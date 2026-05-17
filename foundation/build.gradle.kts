@@ -27,6 +27,7 @@ dependencies {
     api(libs.gson)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.ktx)
     implementation(libs.material)
     implementation(libs.bundles.lifecycle)
     implementation(libs.mmkv)
