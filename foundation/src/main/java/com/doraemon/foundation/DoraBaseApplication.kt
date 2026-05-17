@@ -1,6 +1,7 @@
 package com.doraemon.foundation
 
 import android.app.Application
+import com.doraemon.foundation.utils.MMKVUtil
 import com.doraemon.log.LogConfig
 import com.doraemon.log.LogUtils
 
@@ -15,6 +16,8 @@ abstract class DoraBaseApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         app = this
+        // 初始化MMKV
+        MMKVUtil.init(this)
         // 初始化log能力
         LogUtils.init(isDebug, logConfiguration)
     }
