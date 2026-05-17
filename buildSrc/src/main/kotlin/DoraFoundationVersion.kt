@@ -4,7 +4,7 @@ object DoraFoundationVersion : LibraryInfo() {
     )
     override val flavorDimensions = listOf("1.0")
     override val NAME_SPACE: String
-        get() =  "com.dorameet.foundation"
+        get() =  "com.doraemon.foundation"
     override val APPLICATION_ID: String
-        get() = "com.dorameet.foundation"
+        get() = "com.doraemon.foundation"
 }

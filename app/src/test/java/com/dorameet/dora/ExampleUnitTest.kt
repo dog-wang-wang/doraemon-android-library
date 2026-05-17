@@ -1,4 +1,4 @@
-package com.dorameet.dora
+package com.doraemon.dora
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.dorameet.log
+package com.doraemon.log
 
 import org.junit.Test
 

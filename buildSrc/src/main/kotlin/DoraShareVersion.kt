@@ -4,7 +4,7 @@ object DoraShareVersion: LibraryInfo() {
     )
     override val flavorDimensions = listOf("1.0")
     override val NAME_SPACE: String
-        get() =  "com.dorameet.dora"
+        get() =  "com.doraemon.dora"
     override val APPLICATION_ID: String
-        get() = "com.dorameet.dora"
+        get() = "com.doraemon.dora"
 }

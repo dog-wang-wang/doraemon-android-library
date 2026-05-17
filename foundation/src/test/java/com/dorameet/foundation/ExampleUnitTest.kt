@@ -1,4 +1,4 @@
-package com.dorameet.foundation
+package com.doraemon.foundation
 
 import org.junit.Test
 
