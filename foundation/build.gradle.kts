@@ -27,8 +27,8 @@ dependencies {
     api(project(":log"))
     // gson传递
     api(libs.gson)
-    // material传递
-    api(libs.material)
+    // androidx的core
+    api(libs.androidx.core.ktx)
     // lifecycle
     implementation(libs.bundles.lifecycle)
     // MMKV不透传
