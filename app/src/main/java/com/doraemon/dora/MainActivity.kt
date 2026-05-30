@@ -2,14 +2,11 @@ package com.doraemon.dora
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.doraemon.foundation.screen.activity.CheckTableComponentActivity
+import com.doraemon.foundation_ui_view.screen.activity.CheckTableComponentActivity
 import com.doraemon.foundation.tips.toastShort
 import com.doraemon.foundation.utils.debugWithEvent
-import com.doraemon.log.debug
 
 class MainActivity : CheckTableComponentActivity() {
 

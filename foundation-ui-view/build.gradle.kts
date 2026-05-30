@@ -24,6 +24,7 @@ android {
 }
 
 dependencies {
-    api(libs.material)
+    compileOnly(project(":foundation"))
+    // androidx传递
     api(libs.bundles.androidx)
 }

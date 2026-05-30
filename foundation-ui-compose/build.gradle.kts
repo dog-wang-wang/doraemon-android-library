@@ -24,6 +24,6 @@ android {
 }
 
 dependencies {
-    api(libs.material)
+    compileOnly(project(":foundation"))
     api(libs.bundles.composeBundle)
 }

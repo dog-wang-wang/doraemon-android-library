@@ -27,8 +27,6 @@ dependencies {
     api(project(":log"))
     // gson传递
     api(libs.gson)
-    // androidx传递
-    api(libs.bundles.androidx)
     // material传递
     api(libs.material)
     // lifecycle

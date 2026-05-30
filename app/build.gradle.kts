@@ -61,6 +61,7 @@ android {
 dependencies {
     // 引用本地模块
     implementation(project(":foundation"))
+    implementation(project(":foundation-ui-view"))
     implementation(project(":net"))
     // compose的相关依赖
     val composeBom = platform(libs.androidx.compose.bom)
