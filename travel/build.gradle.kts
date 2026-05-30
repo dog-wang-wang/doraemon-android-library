@@ -39,5 +39,6 @@ android {
 dependencies {
     implementation(project(":foundation"))
     implementation(project(":foundation-ui-compose"))
+    implementation(libs.image.compose.coil)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

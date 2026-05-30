@@ -4,14 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.dora.travel.ui.theme.DoraTheme
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.dora.travel.ui.theme.composable.*
+import com.doraemon.foundation_ui_compose.model.NavigationBarDestinations
+import com.doraemon.foundation_ui_compose.ui.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +23,43 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DoraTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                // 1. 定义导航目标数据
+                val destinations = NavigationBarDestinations(
+                    listOf(
+                        NavigationBarDestinations.ItemDestination(
+                            label = { Text("探索") },
+                            icon = { Icon(Icons.Default.Explore, contentDescription = null) },
+                            routerName = "explore"
+                        ),
+                        NavigationBarDestinations.ItemDestination(
+                            label = { Text("订单") },
+                            icon = { Icon(Icons.AutoMirrored.Filled.ListAlt, contentDescription = null) },
+                            routerName = "orders"
+                        ),
+                        NavigationBarDestinations.ItemDestination(
+                            label = { Text("我的") },
+                            icon = { Icon(Icons.Default.AccountCircle, contentDescription = null) },
+                            routerName = "profile"
+                        )
                     )
-                }
+                )
+
+                // 2. 传入通用的 HomeScreen，并自定义 navHost 内容
+                HomeScreen(
+                    navigationBarDestinations = destinations,
+                    navHost = { navController, startDestination, modifier ->
+                        NavHost(
+                            navController = navController,
+                            startDestination = startDestination,
+                            modifier = modifier
+                        ) {
+                            composable("explore") { ExploreScreen() }
+                            composable("orders") { OrdersScreen() }
+                            composable("profile") { ProfileScreen() }
+                        }
+                    }
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DoraTheme {
-        Greeting("Android")
     }
 }
