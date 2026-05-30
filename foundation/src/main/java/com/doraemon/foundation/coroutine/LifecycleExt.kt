@@ -1,14 +1,9 @@
 package com.doraemon.foundation.coroutine
 
 import android.app.Dialog
-import android.content.Context
-import android.view.View
-import androidx.activity.ComponentActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -16,56 +11,35 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-fun CoroutineScope.launchIO(action: suspend CoroutineScope.() -> Unit) {
+fun CoroutineScope.launchIO(errorHandler: CoroutineExceptionHandler, action: suspend CoroutineScope.() -> Unit) {
     launch(
-        Dispatchers.IO + CoroutineExceptionHandler { _, _ -> },
+        Dispatchers.IO + errorHandler,
         block = action
     )
 }
 
-fun Context.launchIO(action: suspend CoroutineScope.() -> Unit) {
-    (this as? ComponentActivity)?.lifecycleScope?.launchIO(action)
-}
-
-fun View.launchIO(action: suspend CoroutineScope.() -> Unit) {
-    context.launchIO(action)
-}
-
-fun ViewModel.launchIO(action: suspend CoroutineScope.() -> Unit) {
-    viewModelScope.launchIO(action)
-}
-
-fun Fragment.launchIO(action: suspend CoroutineScope.()-> Unit) {
-    lifecycleScope.launchIO { action() }
-}
-
-fun CoroutineScope.launchMain(action: suspend CoroutineScope.() -> Unit) {
+fun CoroutineScope.launchMain(errorHandler: CoroutineExceptionHandler, action: suspend CoroutineScope.() -> Unit) {
     launch(
-        Dispatchers.Main + CoroutineExceptionHandler { _, _ -> },
+        Dispatchers.Main + errorHandler,
         block = action
     )
 }
 
-fun Context.launchMain(action: suspend CoroutineScope.() -> Unit) {
-    (this as? ComponentActivity)?.lifecycleScope?.launchMain(action)
+fun ViewModel.launchIO(errorHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, _ -> }, action: suspend CoroutineScope.() -> Unit) {
+    viewModelScope.launchIO(errorHandler, action)
 }
 
-fun View.launchMain(action: suspend CoroutineScope.() -> Unit) {
-    context.launchMain(action)
+fun ViewModel.launchMain(errorHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, _ -> }, action: suspend CoroutineScope.() -> Unit) {
+    viewModelScope.launchMain(errorHandler, action)
 }
 
-fun ViewModel.launchMain(action: suspend CoroutineScope.() -> Unit) {
-    viewModelScope.launchMain(action)
-}
-
-fun Fragment.launchMain(action: suspend CoroutineScope.() -> Unit) {
-    lifecycleScope.launchMain(action)
-}
-
-
-fun CoroutineScope.launchMainWithDialog(dialog: Dialog, action: suspend CoroutineScope.() -> Unit) {
+fun CoroutineScope.launchMainWithDialog(
+    dialog: Dialog,
+    errorHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, _ -> },
+    action: suspend CoroutineScope.() -> Unit
+) {
     launch(
-        Dispatchers.Main + CoroutineExceptionHandler { _, _ -> dialog.dismiss() },
+        Dispatchers.Main + errorHandler,
         block = {
             dialog.show()
             action.invoke(this)
@@ -74,9 +48,15 @@ fun CoroutineScope.launchMainWithDialog(dialog: Dialog, action: suspend Coroutin
     )
 }
 
-suspend fun <T> withIO(block: suspend () -> T) = withContext(Dispatchers.IO) { block() }
+suspend fun <T> withIO(
+    errorHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, _ -> },
+    block: suspend () -> T
+) = withContext(Dispatchers.IO + errorHandler) { block() }
 
-suspend fun <T> withMain(block: suspend () -> T) = withContext(Dispatchers.Main) { block() }
+suspend fun <T> withMain(
+    errorHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, _ -> },
+    block: suspend () -> T
+) = withContext(Dispatchers.Main + errorHandler) { block() }
 
 fun LifecycleOwner.addOnDestroy(onDestroy: () -> Unit) {
     lifecycle.addObserver(
