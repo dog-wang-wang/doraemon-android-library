@@ -23,7 +23,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -37,7 +38,9 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.androidx.compose.bom))
     implementation(project(":foundation"))
     implementation(project(":foundation-ui-compose"))
+    implementation(libs.image.compose.coil)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
