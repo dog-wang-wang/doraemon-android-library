@@ -37,7 +37,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
     implementation(project(":foundation"))
     implementation(project(":foundation-ui-compose"))
     debugImplementation(libs.androidx.compose.ui.tooling)
