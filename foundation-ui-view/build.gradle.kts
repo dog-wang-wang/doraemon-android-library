@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = DoraFoundationVersion.NAME_SPACE
+    namespace = DoraFoundationViewVersion.NAME_SPACE
     compileSdk {
         version = release(ModuleVersion.SDK_VERSION_COMPILE) {
             minorApiLevel = 1
@@ -20,17 +20,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
 }
 
 dependencies {
-    // log传递
-    api(project(":log"))
-    // gson传递
-    api(libs.gson)
-    // material传递
-    api(libs.material)
-    // lifecycle
-    implementation(libs.bundles.lifecycle)
-    // MMKV不透传
-    implementation(libs.mmkv)
+    compileOnly(project(":foundation"))
+    // androidx传递
+    api(libs.bundles.androidx)
 }

@@ -24,7 +24,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "dora"
 include(":app")
+include(":travel")
 include(":foundation")
 include(":log")
 include(":net")
-include(":travel")
+include(":foundation-ui-compose")
+include(":foundation-ui-view")
