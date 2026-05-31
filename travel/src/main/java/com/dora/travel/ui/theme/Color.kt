@@ -15,6 +15,8 @@ val IndustrialContainerHighest = Color(0xFF2A3548)
 
 val IndustrialOnSurface = Color(0xFFD8E3FB)
 val IndustrialOnSurfaceVariant = Color(0xFFC4C5D9)
+val IndustrialInverseSurface = Color(0xFFD8E3FB)
+val IndustrialInverseOnSurface = Color(0xFF263143)
 
 val IndustrialPrimary = Color(0xFFB8C3FF)
 val IndustrialOnPrimary = Color(0xFF002387)
@@ -28,12 +30,17 @@ val IndustrialOnSecondaryContainer = Color(0xFFE498FF)
 
 val IndustrialTertiary = Color(0xFFBEC6E0)
 val IndustrialOnTertiary = Color(0xFF283044)
+val IndustrialTertiaryContainer = Color(0xFF656D84)
+val IndustrialOnTertiaryContainer = Color(0xFFEDF0FF)
 
 val IndustrialError = Color(0xFFFFB4AB)
 val IndustrialOnError = Color(0xFF690005)
+val IndustrialErrorContainer = Color(0xFF93000A)
+val IndustrialOnErrorContainer = Color(0xFFFFDAD6)
 
 val IndustrialOutline = Color(0xFF8E90A2)
 val IndustrialOutlineVariant = Color(0xFF434656)
+val IndustrialSurfaceTint = Color(0xFFB8C3FF)
 
 // Gradients
 val RoamingGradient = listOf(Color(0xFF2D5BFF), Color(0xFF9D50BB))
