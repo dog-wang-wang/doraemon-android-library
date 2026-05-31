@@ -3,4 +3,7 @@
     <bool name="is_tablet">false</bool>
     <string name="default_dir_name">哆啦</string>
     <string name="event_save_file">保存文件</string>
+    <string name="no_app_camera">未找到相机应用</string>
+    <string name="no_app_gallery">未找到相册应用</string>
+    <string name="no_app_audio">未找到音频应用</string>
 </resources>

@@ -29,6 +29,7 @@ dependencies {
     api(libs.gson)
     // androidx的core
     api(libs.androidx.core.ktx)
+    api(libs.androidx.activity.ktx)
     // lifecycle
     implementation(libs.bundles.lifecycle)
     // MMKV不透传

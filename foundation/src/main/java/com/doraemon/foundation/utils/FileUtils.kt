@@ -105,6 +105,23 @@ private fun Context.saveToMediaStore(
 }
 
 /**
+ * 创建一个文件的uri
+ * @param dir 文件目录
+ * @param fileName 文件名
+ * @param mimeType 存储文件的格式
+ */
+fun Context.createFileUri(dir: String, fileName: String, mimeType: String): Uri? {
+    // 创建文件的Uri
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.RELATIVE_PATH, dir)
+        put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+        put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+    }
+    // 插入文件信息进入外存
+    return tryCatching { contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues) }
+}
+
+/**
  * 常用 MIME 类型常量池
  */
 object MimeType {
