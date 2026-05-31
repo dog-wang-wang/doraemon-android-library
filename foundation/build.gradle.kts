@@ -31,7 +31,7 @@ dependencies {
     api(libs.androidx.core.ktx)
     api(libs.androidx.activity.ktx)
     // lifecycle
-    implementation(libs.bundles.lifecycle)
+    api(libs.bundles.lifecycle)
     // MMKV不透传
     implementation(libs.mmkv)
 }
