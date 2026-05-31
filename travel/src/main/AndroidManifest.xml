@@ -8,6 +8,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:usesCleartextTraffic="true"
         android:supportsRtl="true"
+        android:name=".Doraemon"
         android:theme="@style/Theme.Dora">
         <activity
             android:name=".MainActivity"

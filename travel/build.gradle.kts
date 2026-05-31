@@ -1,6 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    //为了处理room-compiler的冲突问题
+    alias(libs.plugins.ksp)
+    // 为了处理room的版本迁移的时候的schema
+    alias(libs.plugins.room)
 }
 
 android {
@@ -33,7 +37,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
+        buildConfig = true
         compose = true
+    }
+    // 对应插件的生成schema功能
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 
@@ -42,5 +51,7 @@ dependencies {
     implementation(project(":foundation"))
     implementation(project(":foundation-ui-compose"))
     implementation(libs.image.compose.coil)
+    implementation(libs.bundles.room)
+    ksp(libs.room.compiler)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
