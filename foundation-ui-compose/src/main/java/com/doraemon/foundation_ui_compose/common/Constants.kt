@@ -4,4 +4,5 @@ object Constants {
     val LOG_TAG_NAVIGATION by lazy { "自定义Navigation" }
     val LOG_ERROR_NAVIGATION_EMPTY by lazy { "导航栏数据为空" }
     val LOG_ERROR_NAVIGATION_DEFAULT_INVALID by lazy { "默认导航Index无效" }
+    val LOG_DEBUG_NAVIGATION_INDICATOR_LIMITED by lazy { "当前导航Item只显示图标，指示器已自动降级为包裹图标模式" }
 }

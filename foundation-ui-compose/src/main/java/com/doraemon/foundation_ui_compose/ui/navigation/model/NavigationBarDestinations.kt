@@ -1,4 +1,4 @@
-package com.doraemon.foundation_ui_compose.model
+package com.doraemon.foundation_ui_compose.ui.navigation.model
 
 import androidx.compose.runtime.Composable
 import com.doraemon.foundation_ui_compose.common.Constants
@@ -46,12 +46,14 @@ class NavigationBarDestinations(
      * 单个导航目的地。
      *
      * @param label 导航文案。使用 Composable 是为了让调用方可以接入 stringResource、主题字体等 Compose 能力。
-     * @param icon 导航图标。由业务侧提供，基础库只负责摆放和着色。
+     * @param icon 默认导航图标。由业务侧提供，基础库只负责摆放和着色。
+     * @param selectedIcon 选中态图标。为空时复用 [icon]，适合只通过颜色表达选中态的场景。
      * @param routerName 与 NavHost 中 composable(route = ...) 对应的路由字符串。
      */
     data class ItemDestination(
         val label: @Composable () -> Unit,
         val icon: @Composable () -> Unit,
+        val selectedIcon: (@Composable () -> Unit)? = null,
         val routerName: String,
     )
 

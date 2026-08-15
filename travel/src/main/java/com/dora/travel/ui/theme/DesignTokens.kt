@@ -40,7 +40,7 @@ data class TravelGlass(
 @Immutable
 data class TravelGradients(
     val roaming: List<Color> = RoamingGradient,
-    val declarationAction: List<Color> = listOf(IndustrialPrimary, IndustrialPrimaryContainer),
+    val declarationAction: List<Color> = listOf(IndustrialDarkPrimary, IndustrialDarkPrimaryContainer),
 )
 
 val LocalTravelSpacing = compositionLocalOf { TravelSpacing() }

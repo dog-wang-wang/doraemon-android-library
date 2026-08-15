@@ -496,6 +496,8 @@ private fun TransportSegmentedControl(selectedIndex: Int) {
 
 @Composable
 private fun CoverSelector() {
+    val gridLineColor = IndustrialPrimary.copy(alpha = 0.04f)
+
     Column(verticalArrangement = Arrangement.spacedBy(LocalTravelSpacing.current.stackSmall)) {
         SectionLabel(R.string.travel_create_cover)
         Box(
@@ -515,7 +517,7 @@ private fun CoverSelector() {
                 repeat(9) { index ->
                     val y = size.height * index / 8f
                     drawLine(
-                        color = IndustrialPrimary.copy(alpha = 0.04f),
+                        color = gridLineColor,
                         start = Offset(0f, y),
                         end = Offset(size.width, size.height - y),
                     )

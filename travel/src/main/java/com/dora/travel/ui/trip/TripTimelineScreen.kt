@@ -197,6 +197,8 @@ private fun TimelineNodes(nodes: List<TripTimelineNode>) {
 
 @Composable
 private fun BoxScope.TimelineRail() {
+    val railColor = IndustrialPrimary.copy(alpha = 0.3f)
+
     Canvas(
         modifier = Modifier
             .matchParentSize()
@@ -204,7 +206,7 @@ private fun BoxScope.TimelineRail() {
     ) {
         val x = TripTimelineSize.TimelineRailX.toPx()
         drawLine(
-            color = IndustrialPrimary.copy(alpha = 0.3f),
+            color = railColor,
             start = Offset(x, 0f),
             end = Offset(x, size.height),
             strokeWidth = 2.dp.toPx(),
@@ -509,6 +511,11 @@ private fun GradientPillButton(
 @Composable
 private fun AirportPreview(preview: DestinationPreview?) {
     val shape = RoundedCornerShape(LocalTravelRadii.current.small)
+    val previewGradient = listOf(
+        IndustrialPrimary.copy(alpha = 0.24f),
+        IndustrialContainer.copy(alpha = 0.88f),
+    )
+    val horizonColor = IndustrialPrimary.copy(alpha = 0.28f)
 
     Box(
         modifier = Modifier
@@ -520,16 +527,11 @@ private fun AirportPreview(preview: DestinationPreview?) {
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawRect(
-                brush = Brush.verticalGradient(
-                    listOf(
-                        IndustrialPrimary.copy(alpha = 0.24f),
-                        IndustrialContainer.copy(alpha = 0.88f),
-                    )
-                )
+                brush = Brush.verticalGradient(previewGradient)
             )
             val horizonY = size.height * 0.42f
             drawLine(
-                color = IndustrialPrimary.copy(alpha = 0.28f),
+                color = horizonColor,
                 start = Offset(0f, horizonY),
                 end = Offset(size.width, horizonY),
                 strokeWidth = 1.dp.toPx(),
