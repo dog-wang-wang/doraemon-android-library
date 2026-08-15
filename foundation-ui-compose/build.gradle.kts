@@ -29,5 +29,6 @@ android {
 dependencies {
     compileOnly(project(":foundation"))
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.compose.haze)
     api(libs.bundles.composeBundle)
 }

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.doraemon.foundation_ui_compose.ui.navigation.core.navigateTopLevel
-import com.doraemon.foundation_ui_compose.ui.navigation.core.startDestination
+import com.doraemon.foundation_ui_compose.ui.navigation.core.resolveSelection
 import com.doraemon.foundation_ui_compose.ui.navigation.model.NavDestinations
 
 /**
@@ -34,9 +34,9 @@ fun MaterialNavBar(
 ) {
     // currentBackStackEntryAsState 会把导航栈转成 Compose State；路由变化时底栏会自动重组。
     val navBackStackEntry by controller.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-    // 首次进入页面时 currentRoute 可能还没准备好，用默认路由兜底，避免底栏没有任何选中项。
-    val fallbackRoute = destinations.startDestination(NavDestinations.DEFAULT_INDEX)
+    val selection = destinations.resolveSelection(
+        currentRoute = navBackStackEntry?.destination?.route,
+    )
 
     NavigationBar(
         modifier = modifier,
@@ -46,7 +46,7 @@ fun MaterialNavBar(
         windowInsets = NavigationBarDefaults.windowInsets,
     ) {
         destinations.items.forEach { itemDestination ->
-            val selected = itemDestination.route == (currentRoute ?: fallbackRoute)
+            val selected = itemDestination.route == selection.route
 
             NavigationBarItem(
                 selected = selected,

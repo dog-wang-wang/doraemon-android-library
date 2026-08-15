@@ -31,15 +31,10 @@ import com.doraemon.foundation_ui_compose.ui.navigation.model.NavDestinations
 private object TravelNavigationBarTokens {
     val HorizontalPadding = 16.dp
     val BottomPadding = 24.dp
-    val ShadowElevation = 20.dp
+    val ShadowElevation = 8.dp
 
-    const val ShadowAmbientAlpha = 0.14f
-    const val ShadowSpotAlpha = 0.12f
-    const val LiquidTintAlpha = 0.70f
-    const val LiquidHighlightAlpha = 0.18f
-    const val LiquidRefractionAlpha = 0.16f
-    const val LiquidInnerShadowAlpha = 0.14f
-    const val LiquidBorderAlpha = 0.54f
+    const val ShadowAmbientAlpha = 0.04f
+    const val ShadowSpotAlpha = 0.03f
     const val IndicatorAnimationDurationMillis = 280
 }
 
@@ -96,23 +91,7 @@ class MainActivity : ComponentActivity() {
                         ),
                     )
                 val style = FloatingNavDefaults.style(
-                    background = FloatingNavDefaults.liquidGlass(
-                        tint = MaterialTheme.colorScheme.surface.copy(alpha = TravelNavigationBarTokens.LiquidTintAlpha),
-                        highlightColor = MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = TravelNavigationBarTokens.LiquidHighlightAlpha,
-                        ),
-                        refractionColor = MaterialTheme.colorScheme.primary.copy(
-                            alpha = TravelNavigationBarTokens.LiquidRefractionAlpha,
-                        ),
-                        innerShadowColor = MaterialTheme.colorScheme.scrim.copy(
-                            alpha = TravelNavigationBarTokens.LiquidInnerShadowAlpha,
-                        ),
-                        border = FloatingNavDefaults.backgroundBorder(
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(
-                                alpha = TravelNavigationBarTokens.LiquidBorderAlpha,
-                            ),
-                        ),
-                    ),
+                    background = FloatingNavDefaults.frostedGlass(),
                     indicatorStrategy = FloatingNavDefaults.iconAndLabelIndicator(),
                     iconStrategy = FloatingNavDefaults.replaceIconOnSelected(),
                     indicatorAnimationSpec = FloatingNavDefaults.tweenIndicatorAnimation(

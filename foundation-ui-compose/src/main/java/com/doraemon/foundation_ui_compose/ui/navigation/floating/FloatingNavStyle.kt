@@ -5,7 +5,9 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
@@ -17,7 +19,7 @@ import androidx.compose.ui.unit.dp
  * 样式对象把“导航逻辑”和“视觉参数”分开：
  * [FloatingNavBar] 只关心如何根据路由选中 tab，而高度、圆角、背景、内边距都交给这个对象。
  *
- * @param background 背景策略。调用方可以传纯色、图片、玻璃质感等不同实现。
+ * @param background 背景策略。调用方可以传毛玻璃、纯色、图片等不同实现。
  * @param shape 导航栏整体形状，默认是胶囊形。
  * @param height 导航栏高度。
  * @param maxWidth 导航栏最大宽度，平板或横屏时避免底栏被拉得过宽。
@@ -93,6 +95,7 @@ interface NavIndicatorStrategy {
      * 当前指示器策略是否依赖文字区域。
      *
      * 例如“包裹图标和文字”必须在 item 同时显示文字时才有意义。
+     * 当调用方选择了只显示图标时，导航栏会自动降级为只包图标的策略。
      */
     val requiresLabel: Boolean
         get() = false
@@ -117,6 +120,14 @@ object FloatingNavDefaults {
     private const val DEFAULT_TWEEN_DURATION_MILLIS = 260
     private const val DEFAULT_TWEEN_DELAY_MILLIS = 0
     private const val DEFAULT_ICON_AND_LABEL_INDICATOR_WIDTH_FRACTION = 0.82f
+    private const val DEFAULT_FROSTED_BACKGROUND_ALPHA = 0.24f
+    private const val DEFAULT_FROSTED_TINT_ALPHA = 0.18f
+    private const val DEFAULT_FROSTED_HIGHLIGHT_ALPHA = 0.30f
+    private const val DEFAULT_FROSTED_WARM_GLOW_ALPHA = 0.12f
+    private const val DEFAULT_FROSTED_FRESH_GLOW_ALPHA = 0.14f
+    private const val DEFAULT_FROSTED_SUN_GLOW_ALPHA = 0.10f
+    private const val DEFAULT_FROSTED_BACKDROP_BLUR_RADIUS_DP = 24
+    private const val DEFAULT_FROSTED_NOISE_FACTOR = 0.08f
     private const val MIN_FRACTION = 0f
     private const val MAX_FRACTION = 1f
 
@@ -127,7 +138,7 @@ object FloatingNavDefaults {
     val DefaultIconLabelSpacing: Dp = 4.dp
     val DefaultIconIndicatorWidth: Dp = 56.dp
     val DefaultIconIndicatorHeight: Dp = 34.dp
-    val DefaultBackgroundBlurRadius: Dp = 0.dp
+    val DefaultBackgroundLayerBlurRadius: Dp = 14.dp
 
     /**
      * 标准胶囊形状。
@@ -150,14 +161,34 @@ object FloatingNavDefaults {
     /**
      * 只通过颜色表达图标选中态。
      */
-    fun tintIcon(): NavIconStrategy = tintIconStrategy()
+    fun tintIcon(): NavIconStrategy =
+        NavIconStrategy { itemDestination, _, iconColor ->
+            // LocalContentColor 是 Compose 图标/文字常用的颜色传递方式。
+            // 业务传入的 Icon 如果没有手动指定 tint，就会自动读取这里的颜色。
+            CompositionLocalProvider(LocalContentColor provides iconColor) {
+                itemDestination.icon()
+            }
+        }
 
     /**
      * 选中时优先使用 [NavDestinations.Item.selectedIcon]。
      *
      * 如果某个 tab 没有提供 selectedIcon，会自动退回默认 icon，保证调用方可以按需逐个配置。
      */
-    fun replaceIconOnSelected(): NavIconStrategy = replaceIconStrategy()
+    fun replaceIconOnSelected(): NavIconStrategy =
+        NavIconStrategy { itemDestination, selected, iconColor ->
+            // selectedIcon 是可选的：业务可以只给部分 tab 准备 filled 图标。
+            // 没给 selectedIcon 时回退默认 icon，避免调用方为了兼容策略被迫传重复图标。
+            val icon = if (selected) {
+                itemDestination.selectedIcon ?: itemDestination.icon
+            } else {
+                itemDestination.icon
+            }
+
+            CompositionLocalProvider(LocalContentColor provides iconColor) {
+                icon()
+            }
+        }
 
     /**
      * 默认背景边框。
@@ -183,31 +214,40 @@ object FloatingNavDefaults {
     )
 
     /**
-     * 常用的液态玻璃背景。
+     * 常用的毛玻璃背景。
      *
-     * 底层仍由顶层 [liquidGlassBackground] 策略函数实现。
-     * Defaults 入口负责收敛 import，让调用方在大多数页面里只依赖一个默认配置对象。
+     * 这个入口会启用 Haze backdrop blur，并把毛玻璃底色、tint 和噪点映射给 Haze。
+     * Defaults 入口的意义是收敛调用侧 import：业务大多数时候只需要记住
+     * `FloatingNavDefaults.frostedGlass()`，不必直接依赖底层顶层函数。
      */
-    fun liquidGlass(
-        tint: Color,
-        highlightColor: Color,
-        refractionColor: Color,
-        innerShadowColor: Color,
+    fun frostedGlass(
+        backgroundColor: Color = Color.White.copy(alpha = DEFAULT_FROSTED_BACKGROUND_ALPHA),
+        tintColor: Color = Color.White.copy(alpha = DEFAULT_FROSTED_TINT_ALPHA),
+        highlightColor: Color = Color.White.copy(alpha = DEFAULT_FROSTED_HIGHLIGHT_ALPHA),
+        noiseFactor: Float = DEFAULT_FROSTED_NOISE_FACTOR,
+        warmGlowColor: Color = Color(0xFFFFD8CF).copy(alpha = DEFAULT_FROSTED_WARM_GLOW_ALPHA),
+        freshGlowColor: Color = Color(0xFFDDF8EA).copy(alpha = DEFAULT_FROSTED_FRESH_GLOW_ALPHA),
+        sunGlowColor: Color = Color(0xFFFFF1B8).copy(alpha = DEFAULT_FROSTED_SUN_GLOW_ALPHA),
         border: NavBackgroundBorder = backgroundBorder(),
-        blurRadius: Dp = DefaultBackgroundBlurRadius,
-    ): NavBackground = liquidGlassBackground(
-        tint = tint,
+        backdropBlurRadius: Dp = DEFAULT_FROSTED_BACKDROP_BLUR_RADIUS_DP.dp,
+        layerBlurRadius: Dp = DefaultBackgroundLayerBlurRadius,
+    ): NavBackground = frostedGlassBackground(
+        backgroundColor = backgroundColor,
+        tintColor = tintColor,
         highlightColor = highlightColor,
-        refractionColor = refractionColor,
-        innerShadowColor = innerShadowColor,
+        noiseFactor = noiseFactor,
+        warmGlowColor = warmGlowColor,
+        freshGlowColor = freshGlowColor,
+        sunGlowColor = sunGlowColor,
         border = border,
-        blurRadius = blurRadius,
+        backdropBlurRadius = backdropBlurRadius,
+        layerBlurRadius = layerBlurRadius,
     )
 
     /**
      * 默认弹簧动画。
      *
-     * 弹簧动画没有固定时长，它根据距离和阻尼自然收敛，适合“液态玻璃”这种带一点弹性的手感。
+     * 弹簧动画没有固定时长，它根据距离和阻尼自然收敛，适合有弹性的浮动导航手感。
      */
     fun springIndicatorAnimation(
         dampingRatio: Float = DEFAULT_SPRING_DAMPING_RATIO,
@@ -234,6 +274,9 @@ object FloatingNavDefaults {
      * 指示器只包裹图标。
      *
      * 这是比较轻的 iOS 风格：图标背后有一个会滑动的胶囊光影，文字只跟随变色。
+     *
+     * @param width 指示器宽度，会被限制在单个 tab 宽度以内。
+     * @param height 指示器高度。
      */
     fun iconIndicator(
         width: Dp = DefaultIconIndicatorWidth,
@@ -254,6 +297,8 @@ object FloatingNavDefaults {
      * 指示器包裹图标和文字。
      *
      * 适合希望选中态更强的导航栏：滑动胶囊会覆盖整个 tab 的主要内容区域。
+     *
+     * @param widthFraction 指示器占单个 tab 宽度的比例，会被限制在 0f..1f。
      */
     fun iconAndLabelIndicator(
         widthFraction: Float = DEFAULT_ICON_AND_LABEL_INDICATOR_WIDTH_FRACTION,
@@ -280,9 +325,12 @@ object FloatingNavDefaults {
      *     background = solidBackground(Color.Black)
      * )
      * ```
+     *
+     * 这里暴露的是稳定的组合入口。调用方可以只覆盖一个参数，
+     * 其余值继续沿用基础库默认规范。
      */
     fun style(
-        background: NavBackground = frostedGlassBackground(),
+        background: NavBackground = frostedGlass(),
         shape: Shape = capsuleShape(),
         height: Dp = DefaultHeight,
         maxWidth: Dp = DefaultMaxWidth,

@@ -16,10 +16,18 @@ import com.doraemon.foundation_ui_compose.ui.navigation.model.NavDestinations
  * 带自定义悬浮导航栏的首页脚手架。
  *
  * 它适合类似 iOS 的“悬浮胶囊底栏”：底栏浮在内容上方，页面背景可以从底部透出来。
+ * 这里的“悬浮”只表示布局关系：导航栏覆盖在内容之上，不会自动和系统导航栏绑定。
  *
  * 和 [com.doraemon.foundation_ui_compose.ui.navigation.material.MaterialNavScreen] 的区别：
  * - MaterialNavScreen 使用 Scaffold.bottomBar，底栏会占据页面空间。
  * - FloatingNavScaffold 把底栏放在 Box 之上，底栏覆盖在内容上，不参与 Scaffold 的底部占位。
+ *
+ * 毛玻璃背景需要知道“导航栏背后是什么内容”。因此脚手架内部会创建一个 backdrop 绑定：
+ * - 业务内容通过 `hazeSource` 注册为可取样内容。
+ * - 导航栏通过 `hazeEffect` 只模糊自己覆盖到的局部区域。
+ * - 背景策略提供的颜色、噪点和模糊半径会和底层状态绑定在一起，避免调用方分别传入两套配置。
+ *
+ * 业务侧不需要直接感知 Haze，也不需要手动传截图或背景 bitmap。
  *
  * @param destinations 底栏数据。
  * @param barModifier 只作用于悬浮底栏容器，适合设置外边距、阴影、额外裁剪等。
@@ -43,17 +51,27 @@ fun FloatingNavScaffold(
     // 底栏和 NavHost 必须共用同一个 NavController，才能保证点击 tab 后页面和高亮状态一致。
     val navController = rememberNavController()
     val startDestination = destinations.startDestination(defaultIndex)
+    val backdrop = rememberFloatingNavBackdrop(style.background)
 
     Scaffold(modifier = modifier) { contentPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
             // 业务内容仍然消费 Scaffold 的系统栏 padding，但不会为悬浮底栏额外让位。
-            navHost(navController, startDestination, Modifier.padding(contentPadding))
+            // hazeSource 会把这块页面注册成 Haze 的取样源，导航栏只模糊自己覆盖到的那一小块区域。
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .floatingBackdropSource(backdrop),
+            ) {
+                navHost(navController, startDestination, Modifier.padding(contentPadding))
+            }
             FloatingNavBar(
                 controller = navController,
                 destinations = destinations,
+                // align 只作用在外层摆放容器上，不参与内部胶囊裁剪，避免圆角被外部 padding 影响。
                 modifier = barModifier
                     .align(alignment),
                 style = style,
+                backdrop = backdrop,
             )
         }
     }

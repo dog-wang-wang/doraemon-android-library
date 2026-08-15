@@ -1,6 +1,6 @@
 # Floating navigation bar
 
-`foundation-ui-compose` 的 `ui.navigation.floating` 包提供了一套 Compose 自定义悬浮导航基建，用来构建类似 iOS 胶囊导航栏、毛玻璃导航栏和液态玻璃导航栏的体验。
+`foundation-ui-compose` 的 `ui.navigation.floating` 包提供了一套 Compose 自定义悬浮导航基建，用来构建类似 iOS 胶囊导航栏和毛玻璃导航栏的体验。
 
 它不是 Material3 `NavigationBar` 的二次包装。这个组件只复用 Compose 布局、动画和导航能力，视觉由基础库自己的 style 和策略对象控制。
 
@@ -75,7 +75,7 @@ fun TravelHome() {
 当前 navigation 包结构如下：
 
 - `ui.navigation.model`：共享导航数据模型。
-- `ui.navigation.core`：共享 NavController 扩展和路由计算。
+- `ui.navigation.core`：共享路由状态计算和 NavController 扩展。
 - `ui.navigation.material`：Material3 底部导航实现。
 - `ui.navigation.floating`：自定义悬浮导航实现。
 
@@ -148,13 +148,30 @@ data class FloatingNavStyle(
 
 ## Component responsibilities
 
+navigation 基建的职责边界如下：
+
+- `NavDestinations`：只描述导航数据，包括 tab 顺序、默认 tab、路由、图标和文案；不依赖 Material 或 Floating UI。
+- `NavigationState`：只负责根据 `NavDestinations` 和当前路由计算安全首页与选中态；Material 和 Floating 共用这套逻辑。
+- `NavigationControllerExt`：只封装 top-level tab 跳转行为，例如 `launchSingleTop`、`restoreState` 和 `popUpTo`。
+- `MaterialNavScreen`：创建 `NavController`，使用 `Scaffold.bottomBar` 承载 Material 底栏，并把 `contentPadding` 交给业务页面。
+- `MaterialNavBar`：只负责 Material3 底栏的显示、选中态和点击，不自定义浮动视觉。
+- `FloatingNavScaffold`：创建 `NavController`，把业务内容和浮动导航栏叠放到同一个容器；当背景需要毛玻璃时，注册 Haze backdrop source。
+- `FloatingNavBar`：只负责浮动导航栏的显示、选中态、滑动指示器和 tab 点击；真实模糊配置从背景策略映射到底层 Haze。
+- `FloatingNavStyle`：只描述浮动导航栏视觉配置，例如尺寸、形状、内容模式、颜色策略、图标策略、指示器策略和点击反馈。
+- `NavBackground`：只描述背景策略；纯色和图片只绘制背景，毛玻璃额外声明 `NavBackdropEffect`。
+- `NavItemStyle`：只描述 tab 内容颜色策略和图标策略。
+
 `FloatingNavScaffold` 负责创建并共享 `NavController`，把导航栏覆盖到业务内容之上。
+
+当背景策略需要真实毛玻璃时，`FloatingNavScaffold` 还会把业务内容注册成 Haze 的 backdrop source。
+这样导航栏只模糊自己覆盖到的页面区域，不会和系统导航栏产生隐式绑定，也不会要求业务手动传递截图或背景。
 
 `FloatingNavBar` 负责读取当前路由、计算选中项、绘制滑动指示器和处理 tab 点击。
 
 `FloatingNavStyle` 只负责视觉，不负责位置。高度、圆角、背景、颜色、动画都属于 style；底部距离、系统栏避让、居中显示等摆放规则应该通过 `barModifier` 和 `alignment` 控制。
 
-`NavBackground` 负责背景材质绘制。边框是背景材质的边缘收口，因此也作为 background strategy 的参数传入。
+`NavBackground` 负责描述背景策略。毛玻璃策略会额外声明 `NavBackdropEffect`，导航栏内部再把它映射到底层 Haze 配置。
+边框是背景材质的边缘收口，因此也作为 background strategy 的参数传入。
 
 ## Border
 
@@ -162,7 +179,7 @@ data class FloatingNavStyle(
 
 ```kotlin
 val style = FloatingNavDefaults.style(
-    background = FloatingNavDefaults.liquidGlass(
+    background = FloatingNavDefaults.frostedGlass(
         border = FloatingNavDefaults.backgroundBorder(
             width = 1.dp,
             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.54f),
@@ -179,11 +196,11 @@ val style = FloatingNavDefaults.style(
 
 ```kotlin
 val style = FloatingNavDefaults.style(
-    background = FloatingNavDefaults.liquidGlass(
-        tint = MaterialTheme.colorScheme.surface.copy(alpha = 0.70f),
-        highlightColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.18f),
-        refractionColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
-        innerShadowColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.14f),
+    background = FloatingNavDefaults.frostedGlass(
+        backgroundColor = Color.White.copy(alpha = 0.24f),
+        tintColor = Color.White.copy(alpha = 0.18f),
+        highlightColor = Color.White.copy(alpha = 0.30f),
+        noiseFactor = 0.08f,
         border = FloatingNavDefaults.backgroundBorder(
             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.54f),
         ),
@@ -194,11 +211,47 @@ val style = FloatingNavDefaults.style(
 内置背景策略：
 
 - `solidBackground`：纯色背景，适合品牌色或明确实体底栏。
-- `translucentBackground`：轻量半透明背景，适合简单玻璃感。
-- `glassBackground`：基础玻璃背景，适合弱质感场景。
 - `frostedGlassBackground`：毛玻璃背景，强调磨砂、雾化、朦胧感。
-- `liquidGlassBackground`：液态玻璃背景，强调高光、折射和柔和流动质感。
 - `imageBackground`：图片背景，适合强品牌视觉或节日主题。
+
+## Frosted Glass
+
+毛玻璃策略由两部分组成：
+
+- Haze 负责真实 backdrop blur，并接管毛玻璃的 `backgroundColor`、`tintColor`、`blurRadius` 和 `noiseFactor`。
+- `NavBackground` 负责补充导航栏自己的材质层，包括柔光、高光和边框。
+
+`NavBackdropEffect` 是背景策略和底层库之间的映射对象。公开 API 只使用 Compose 基础类型，不把 Haze 类型泄露给业务：
+
+```kotlin
+data class NavBackdropEffect(
+    val blurRadius: Dp,
+    val backgroundColor: Color,
+    val tintColor: Color,
+    val noiseFactor: Float,
+)
+```
+
+`FloatingNavScaffold` 会在内部把 `NavBackdropEffect` 和 Haze 需要的状态绑定成 `FloatingNavBackdrop`：
+
+- 业务只需要写 `background = FloatingNavDefaults.frostedGlass()`。
+- 基建内部自动创建并复用 Haze 状态。
+- 纯色和图片背景不会生成 `FloatingNavBackdrop`，也不会承担真实模糊成本。
+
+最后由内部适配层把绑定对象转换成 Haze 配置：
+
+```kotlin
+backgroundColor = backdrop.effect.backgroundColor
+tints = listOf(HazeTint(backdrop.effect.tintColor))
+blurRadius = backdrop.effect.blurRadius
+noiseFactor = backdrop.effect.noiseFactor
+```
+
+这样可以保证职责单一：毛玻璃颜色、噪点和 blur 参数交给底层模糊库；基础库自己的背景策略只补充高光、环境光和边框。
+毛玻璃策略不会再额外绘制一层 `backgroundColor`，避免 Haze 背景色和材质层重复叠加导致导航栏过于不透明。
+
+当前没有使用 Cloudy。原因是 `com.github.skydoves:cloudy-native:1.0.0-alpha01` 要求依赖方使用 `compileSdk 37`，
+而当前示例应用编译在 `android-36.1`。作为基建库，毛玻璃效果不应该强制所有接入方提升 compileSdk 门槛。
 
 ## Indicator strategies
 
@@ -285,7 +338,7 @@ val style = FloatingNavDefaults.style(
 
 可选动画工厂：
 
-- `springIndicatorAnimation()`：弹簧动画，适合轻微弹性的液态玻璃手感。
+- `springIndicatorAnimation()`：弹簧动画，适合轻微弹性的浮动导航手感。
 - `tweenIndicatorAnimation()`：固定时长动画，适合设计稿明确要求毫秒数的场景。
 
 ## Click indication
@@ -365,14 +418,27 @@ barModifier = Modifier
 - 选中项图标和文字颜色会跟随 `MaterialTheme.colorScheme` 变化。
 - 点击 ripple 默认关闭。
 
+## Verification
+
+修改导航基建后，优先运行完整 debug 构建：
+
+```bash
+./gradlew :travel:assembleDebug
+```
+
+`compileDebugKotlin` 只能验证 Kotlin 编译，不能覆盖 AAR metadata、资源合并、manifest 处理和 APK 打包。
+引入或替换第三方 Compose 视觉库时，必须用 `assembleDebug` 确认不会出现 compileSdk 要求不匹配或运行时依赖问题。
+
 ## Related files
 
 - `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/model/NavDestinations.kt`
+- `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/core/NavigationState.kt`
 - `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/core/NavigationControllerExt.kt`
 - `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/material/MaterialNavScreen.kt`
 - `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/material/MaterialNavBar.kt`
 - `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/floating/FloatingNavScaffold.kt`
 - `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/floating/FloatingNavBar.kt`
+- `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/floating/FloatingNavBackdrop.kt`
 - `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/floating/FloatingNavStyle.kt`
 - `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/floating/NavBackground.kt`
-- `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/floating/FloatingNavItemStyle.kt`
+- `foundation-ui-compose/src/main/java/com/doraemon/foundation_ui_compose/ui/navigation/floating/NavItemStyle.kt`

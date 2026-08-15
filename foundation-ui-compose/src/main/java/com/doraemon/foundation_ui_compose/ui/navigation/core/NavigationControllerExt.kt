@@ -2,23 +2,6 @@ package com.doraemon.foundation_ui_compose.ui.navigation.core
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.doraemon.foundation_ui_compose.ui.navigation.model.NavDestinations
-
-/**
- * 计算安全的首页路由。
- *
- * [NavDestinations.getDefaultIndex] 会先校验列表非空，再把非法下标修正到合法范围。
- * 因此这里返回的一定是可以传给 NavHost 的 route。
- */
-internal fun NavDestinations.startDestination(defaultIndex: Int): String {
-    val safeDefaultIndex = getDefaultIndex()
-    val startIndex = if (defaultIndex == NavDestinations.DEFAULT_INDEX) {
-        safeDefaultIndex
-    } else {
-        defaultIndex.coerceIn(items.indices)
-    }
-    return items[startIndex].route
-}
 
 /**
  * 执行底部 tab 的 top-level 导航。

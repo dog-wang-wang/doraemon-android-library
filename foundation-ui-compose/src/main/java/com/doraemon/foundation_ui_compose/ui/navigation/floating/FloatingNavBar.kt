@@ -39,13 +39,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.doraemon.foundation_ui_compose.common.Constants
 import com.doraemon.foundation_ui_compose.ui.navigation.core.navigateTopLevel
-import com.doraemon.foundation_ui_compose.ui.navigation.core.startDestination
+import com.doraemon.foundation_ui_compose.ui.navigation.core.resolveSelection
 import com.doraemon.foundation_ui_compose.ui.navigation.model.NavDestinations
 import com.doraemon.log.debug
 
 private object FloatingNavTokens {
-    const val NOT_FOUND_INDEX = -1
-    const val FIRST_INDEX = 0
     const val SELECTED_INDICATOR_ALPHA = 0.18f
     const val ITEM_WEIGHT = 1f
     const val DOUBLE_SPACE_FACTOR = 2
@@ -56,10 +54,14 @@ private object FloatingNavTokens {
 }
 
 /**
- * iOS 风格的自定义浮动底部导航。
+ * 自定义浮动底部导航。
  *
  * 这个组件没有使用 Material3 的 NavigationBarItem，因为悬浮胶囊导航通常需要更自由的形状、
  * 背景和选中态。它只复用 Compose 基础布局能力，自行控制每个 tab 的视觉。
+ * 
+ * 这个公开函数适合单独使用导航栏本体。如果需要真实毛玻璃，请优先使用 [FloatingNavScaffold]，
+ * 因为毛玻璃需要额外的 backdrop source；单独使用时背景策略仍会绘制 tint、柔光和噪点，
+ * 但无法采样并模糊页面内容。
  *
  * @param controller 页面导航控制器。它同时提供当前路由和点击后的跳转能力。
  * @param destinations 导航项配置。
@@ -73,17 +75,31 @@ fun FloatingNavBar(
     modifier: Modifier = Modifier,
     style: FloatingNavStyle = FloatingNavDefaults.style(),
 ) {
+    FloatingNavBar(
+        controller = controller,
+        destinations = destinations,
+        modifier = modifier,
+        style = style,
+        backdrop = null,
+    )
+}
+
+@Composable
+internal fun FloatingNavBar(
+    controller: NavController,
+    destinations: NavDestinations,
+    modifier: Modifier,
+    style: FloatingNavStyle,
+    backdrop: FloatingNavBackdrop?,
+) {
     // 从导航栈读取当前路由，作为底栏选中态的唯一来源。
     // 这样即使页面不是通过点击底栏进入，高亮状态也能正确同步。
     val navBackStackEntry by controller.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-    // 首次组合时 currentRoute 可能为 null，用默认路由兜底。
-    // 没有元素的时候会被抛异常
-    val fallbackRoute = destinations.startDestination(NavDestinations.DEFAULT_INDEX)
-    val selectedRoute = currentRoute ?: fallbackRoute
-    val selectedIndex = destinations.items
-        .indexOfFirst { it.route == selectedRoute }
-        .takeIf { it != FloatingNavTokens.NOT_FOUND_INDEX } ?: FloatingNavTokens.FIRST_INDEX
+    val selection = destinations.resolveSelection(
+        currentRoute = navBackStackEntry?.destination?.route,
+    )
+    // “包图标和文字”的指示器依赖文字区域；如果当前只显示图标，就自动降级为只包图标。
+    // 这属于展示能力受模式限制，不是致命错误，所以只打 debug 日志，不抛异常。
     val indicatorLimited = style.indicatorStrategy.requiresLabel &&
         style.itemContentMode is NavItemContentMode.IconOnly
     val resolvedIndicatorStrategy = resolveIndicatorStrategy(style)
@@ -101,10 +117,11 @@ fun FloatingNavBar(
         FloatingNavContent(
             controller = controller,
             destinations = destinations,
-            selectedRoute = selectedRoute,
-            selectedIndex = selectedIndex,
+            selectedRoute = selection.route,
+            selectedIndex = selection.index,
             resolvedIndicatorStrategy = resolvedIndicatorStrategy,
             style = style,
+            backdrop = backdrop,
         )
     }
 }
@@ -126,12 +143,14 @@ private fun FloatingNavContent(
     selectedIndex: Int,
     resolvedIndicatorStrategy: NavIndicatorStrategy,
     style: FloatingNavStyle,
+    backdrop: FloatingNavBackdrop?,
 ) {
     BoxWithConstraints(
         modifier = Modifier
             .widthIn(max = style.maxWidth)
             .fillMaxWidth()
             .height(style.height)
+            .floatingBackdropEffect(backdrop)
             .clip(style.shape),
     ) {
         // 背景先画，tab 内容后画；这就是常见的“背景层 + 内容层”结构。
@@ -151,7 +170,8 @@ private fun FloatingNavContent(
                 navigationBarHeight = style.height,
                 verticalPadding = style.verticalPadding,
             )
-            // 计算指示器偏移量
+            // 指示器的 x 偏移 = 左侧内边距 + 已经过的 tab 宽度 + 在当前 tab 内居中需要的偏移。
+            // 指示器只画一个，通过 animateDpAsState 在不同 tab 之间移动，所以切换会有滑动感。
             val indicatorOffset = style.horizontalPadding +
                 itemWidth * selectedIndex.toFloat() +
                 (itemWidth - indicatorBounds.width) / 2
@@ -252,6 +272,7 @@ private fun FloatingNavItem(
                 iconStrategy.icon(
                     itemDestination = itemDestination,
                     selected = selected,
+                    // 图标颜色由 itemColorStrategy 决定，再交给 iconStrategy 注入到图标内容里。
                     iconColor = iconColor,
                 )
             }
@@ -277,6 +298,7 @@ private fun resolveIndicatorStrategy(
     val labelHidden = style.itemContentMode is NavItemContentMode.IconOnly
 
     return if (indicatorRequiresLabel && labelHidden) {
+        // 配置受限时使用最接近当前内容模式的策略：只显示图标，就只包裹图标。
         FloatingNavDefaults.iconIndicator()
     } else {
         style.indicatorStrategy
